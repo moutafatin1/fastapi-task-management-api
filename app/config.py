@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
-    SQLALCHEMY_DATABASE_URL: PostgresDsn | None = None
+    SQLALCHEMY_DATABASE_URL: PostgresDsn
 
     class Config:
         env_file = ".env"
