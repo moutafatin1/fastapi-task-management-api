@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.tasks.models import Task
-from app.tasks.schemas import TaskCreateDto
+from app.tasks.schemas import TaskCreateDto, TaskUpdateDto
 
 
 async def get_tasks(db: AsyncSession):
@@ -25,3 +25,12 @@ async def create_task(db: AsyncSession, data: TaskCreateDto):
     db.add(new_task)
     await db.commit()
     return new_task
+
+
+async def update_task(db: AsyncSession, id: int, data: TaskUpdateDto):
+    task = await get_task_by_id(db, id)
+    await db.execute(
+        update(Task).where(Task.id == id).values(**data.dict(exclude_none=True))
+    )
+    await db.commit()
+    return task

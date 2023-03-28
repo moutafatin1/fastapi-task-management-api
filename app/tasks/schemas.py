@@ -13,5 +13,11 @@ class TaskDto(TaskBaseDto):
     id: int
 
 
-class TaskCreateDto(TaskBaseDto):
+class TaskCreateDto(BaseModel):
+    body: str
+    completed: bool | None = None
+
+
+class TaskUpdateDto(BaseModel):
+    body: str | None = None
     completed: bool | None = None

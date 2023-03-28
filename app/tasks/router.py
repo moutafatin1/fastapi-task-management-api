@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.tasks import service
-from app.tasks.schemas import TaskCreateDto, TaskDto
+from app.tasks.schemas import TaskCreateDto, TaskDto, TaskUpdateDto
 
 tasks_router = APIRouter(tags=["Tasks"], prefix="/tasks")
 
@@ -25,3 +25,8 @@ async def get_task_by_id(id: int, db: db_deps):
 @tasks_router.post("/", response_model=TaskDto)
 async def create_task(db: db_deps, data: TaskCreateDto):
     return await service.create_task(db, data)
+
+
+@tasks_router.put("/{id}")
+async def update_task(id: int, db: db_deps, data: TaskUpdateDto):
+    return await service.update_task(db, id, data)
