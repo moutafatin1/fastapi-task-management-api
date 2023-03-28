@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.tasks.models import Task
+from app.tasks.schemas import TaskCreateDto
 
 
 async def get_tasks(db: AsyncSession):
@@ -17,3 +18,10 @@ async def get_task_by_id(db: AsyncSession, id: int):
             status_code=status.HTTP_404_NOT_FOUND,
         )
     return task
+
+
+async def create_task(db: AsyncSession, data: TaskCreateDto):
+    new_task = Task(**data.dict(exclude_none=True))
+    db.add(new_task)
+    await db.commit()
+    return new_task
