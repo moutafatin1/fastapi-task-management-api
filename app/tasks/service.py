@@ -6,8 +6,8 @@ from app.tasks.models import Task
 from app.tasks.schemas import TaskCreateDto, TaskUpdateDto
 
 
-async def get_tasks(db: AsyncSession):
-    return (await db.scalars(select(Task))).all()
+async def get_tasks(db: AsyncSession, user_id: int):
+    return (await db.scalars(select(Task).where(Task.user_id == user_id))).all()
 
 
 async def get_task_by_id(db: AsyncSession, id: int):
@@ -20,8 +20,8 @@ async def get_task_by_id(db: AsyncSession, id: int):
     return task
 
 
-async def create_task(db: AsyncSession, data: TaskCreateDto):
-    new_task = Task(**data.dict(exclude_none=True))
+async def create_task(db: AsyncSession, data: TaskCreateDto, user_id: int):
+    new_task = Task(**data.dict(exclude_none=True), user_id=user_id)
     db.add(new_task)
     await db.commit()
     return new_task

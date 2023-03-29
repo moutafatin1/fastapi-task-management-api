@@ -4,8 +4,9 @@ from typing import Annotated
 from fastapi import Cookie, Depends
 
 from app.auth import jwt, service
-from app.auth.exceptions import RefreshTokenInvalid
-from app.auth.models import RefreshToken
+from app.auth.exceptions import AuthRequired, RefreshTokenInvalid
+from app.auth.models import RefreshToken, User
+from app.auth.schemas import JWTData
 from app.database import db_deps
 
 
@@ -29,6 +30,18 @@ async def valid_refresh_token_user(
     if not user:
         raise RefreshTokenInvalid()
     return user
+
+
+async def current_user(
+    token: Annotated[JWTData, Depends(jwt.parse_jwt_user_data)], db: db_deps
+):
+    user = await service.get_user_by_username(db, token.username)
+    if not user:
+        raise AuthRequired()
+    return user
+
+
+CurrentUser = Annotated[User, Depends(current_user)]
 
 
 def _is_valid_refresh_token(db_refresh_token: RefreshToken) -> bool:

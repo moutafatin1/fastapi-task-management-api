@@ -11,7 +11,7 @@ class TaskBaseDto(BaseModel):
 
 class TaskDto(TaskBaseDto):
     id: int
-
+    user_id:int
 
 class TaskCreateDto(BaseModel):
     body: str
