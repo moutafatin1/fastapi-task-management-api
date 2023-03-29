@@ -4,9 +4,17 @@ from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.auth import jwt, service
-from app.auth.schemas import AccessTokenResponse, JWTData, LoginDto, RegisterDto
+from app.auth.dependencies import valid_refresh_token, valid_refresh_token_user
+from app.auth.models import RefreshToken, User
+from app.auth.schemas import (
+    AccessTokenResponse,
+    JWTData,
+    LoginDto,
+    RegisterDto,
+    UserDto,
+)
+from app.auth.utils import get_refresh_token_cookie_settings
 from app.database import db_deps
-from app.users.schemas import UserDto
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -25,7 +33,27 @@ async def login(
     user = await service.login(
         db, LoginDto(username=form_data.username, password=form_data.password)
     )
-    return AccessTokenResponse(access_token=jwt.create_access_token(user))
+    refresh_token = await jwt.create_refresh_token(db, user.id)
+
+    response.set_cookie(**get_refresh_token_cookie_settings(refresh_token))
+    return AccessTokenResponse(
+        access_token=jwt.create_access_token(user), refresh_token=refresh_token
+    )
+
+
+@auth_router.put("/refreshtoken", response_model=AccessTokenResponse)
+async def get_refresh_token(
+    response: Response,
+    refresh_token: Annotated[RefreshToken, Depends(valid_refresh_token)],
+    user: Annotated[User, Depends(valid_refresh_token_user)],
+    db: db_deps,
+):
+    refresh_token_value = await jwt.create_refresh_token(db, user.id)
+
+    response.set_cookie(**get_refresh_token_cookie_settings(refresh_token_value))
+    return AccessTokenResponse(
+        access_token=jwt.create_access_token(user), refresh_token=refresh_token_value
+    )
 
 
 @auth_router.get("/me", response_model=UserDto)

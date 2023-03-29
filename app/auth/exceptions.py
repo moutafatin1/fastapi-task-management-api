@@ -16,3 +16,7 @@ class InvalidToken(NotAuthenticated):
 
 class AuthRequired(NotAuthenticated):
     DETAIL = ErrorText.AUTHENTICATION_REQUIRED
+
+
+class RefreshTokenInvalid(NotAuthenticated):
+    DETAIL = ErrorText.REFRESH_TOKEN_NOT_VALID

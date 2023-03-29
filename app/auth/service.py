@@ -2,13 +2,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.exceptions import CredentialsInvalid, UsernameAlreadyExists
+from app.auth.models import User
 from app.auth.schemas import LoginDto, RegisterDto
 from app.auth.security import hash_password, verify_and_update_password
-from app.users.models import User
 
 
 async def get_user_by_username(db: AsyncSession, username: str):
     return await db.scalar(select(User).where(User.username == username))
+
+
+async def get_user_by_id(db: AsyncSession, id: int):
+    return await db.scalar(select(User).where(User.id == id))
 
 
 async def register(

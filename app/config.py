@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URL: PostgresDsn
+    SITE_DOMAIN: str  # "site.com"
 
     class Config:
         env_file = ".env"

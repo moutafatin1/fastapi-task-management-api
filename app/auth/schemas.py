@@ -1,6 +1,14 @@
 from pydantic import BaseModel, Field
 
 
+class UserDto(BaseModel):
+    id: int
+    username: str
+
+    class Config:
+        orm_mode = True
+
+
 class AuthBaseDto(BaseModel):
     username: str
     password: str
@@ -20,4 +28,4 @@ class JWTData(BaseModel):
 
 class AccessTokenResponse(BaseModel):
     access_token: str
-    # refresh_token: str
+    refresh_token: str
