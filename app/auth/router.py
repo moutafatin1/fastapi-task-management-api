@@ -1,9 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.auth import jwt, service
+from app.auth import jwt, service, utils
 from app.auth.dependencies import valid_refresh_token, valid_refresh_token_user
 from app.auth.models import RefreshToken, User
 from app.auth.schemas import (
@@ -41,15 +41,16 @@ async def login(
     )
 
 
-@auth_router.put("/refreshtoken", response_model=AccessTokenResponse)
+@auth_router.put("/tokens", response_model=AccessTokenResponse)
 async def get_refresh_token(
+    worker: BackgroundTasks,
     response: Response,
     refresh_token: Annotated[RefreshToken, Depends(valid_refresh_token)],
     user: Annotated[User, Depends(valid_refresh_token_user)],
     db: db_deps,
 ):
     refresh_token_value = await jwt.create_refresh_token(db, user.id)
-
+    worker.add_task(jwt.expire_refresh_token, db, refresh_token.id)
     response.set_cookie(**get_refresh_token_cookie_settings(refresh_token_value))
     return AccessTokenResponse(
         access_token=jwt.create_access_token(user), refresh_token=refresh_token_value
@@ -62,3 +63,17 @@ async def get_current_user(
 ):
     user = await service.get_user_by_username(db, jwt_data.username)
     return user
+
+
+@auth_router.delete("/tokens")
+async def logout(
+    response: Response,
+    refresh_token: Annotated[RefreshToken, Depends(valid_refresh_token)],
+    db: db_deps,
+):
+    await jwt.expire_refresh_token(db, refresh_token.id)
+    response.delete_cookie(
+        **utils.get_refresh_token_cookie_settings(
+            refresh_token.refresh_token, expired=True
+        )
+    )

@@ -10,8 +10,10 @@ from app.database import db_deps
 
 
 async def valid_refresh_token(
-    refresh_token: Annotated[str, Cookie(..., alias="refreshToken")], db: db_deps
+    db: db_deps, refresh_token: str | None = Cookie(alias="refreshToken", default=None)
 ):
+    if not refresh_token:
+        raise RefreshTokenInvalid()
     db_refresh_token = await jwt.get_refresh_token(db, refresh_token)
     if not db_refresh_token:
         raise RefreshTokenInvalid()

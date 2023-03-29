@@ -5,7 +5,8 @@ from uuid import uuid4
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from sqlalchemy import select
+from pydantic import UUID4
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import utils
@@ -67,3 +68,12 @@ async def get_refresh_token(db: AsyncSession, refresh_token: str):
     return await db.scalar(
         select(RefreshToken).where(RefreshToken.refresh_token == refresh_token)
     )
+
+
+async def expire_refresh_token(db: AsyncSession, refresh_token_id: UUID4):
+    await db.execute(
+        update(RefreshToken)
+        .where(RefreshToken.id == refresh_token_id)
+        .values(expires_at=datetime.utcnow() - timedelta(days=1))
+    )
+    await db.commit()
