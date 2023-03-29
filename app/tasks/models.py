@@ -1,6 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.database import Base, get_db
+from app.database import Base
+from app.users.models import User
 
 
 class Task(Base):
@@ -9,17 +11,5 @@ class Task(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     body: Mapped[str]
     completed: Mapped[bool] = mapped_column(default=False)
-
-
-async def seed_db():
-    db_gen = get_db()
-    db = await anext(db_gen)
-    db.add_all(
-        [
-            Task(body="First task"),
-            Task(body="Second task"),
-            Task(body="Third task"),
-        ]
-    )
-    await db.commit()
-    await db.close()
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="tasks")
