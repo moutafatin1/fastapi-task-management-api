@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AuthBaseDto(BaseModel):
@@ -12,3 +12,12 @@ class LoginDto(AuthBaseDto):
 
 class RegisterDto(AuthBaseDto):
     pass
+
+
+class JWTData(BaseModel):
+    username: str = Field(alias="sub")
+
+
+class AccessTokenResponse(BaseModel):
+    access_token: str
+    # refresh_token: str
