@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URL: PostgresDsn
+    SQLALCHEMY_DATABASE_URL_SYNC: PostgresDsn
     SITE_DOMAIN: str  # "site.com"
 
     class Config:
