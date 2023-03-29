@@ -1,15 +1,10 @@
-from typing import Annotated
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.database import get_db
+from app.database import db_deps
 from app.tasks import service
 from app.tasks.schemas import TaskCreateDto, TaskDto, TaskUpdateDto
 
 tasks_router = APIRouter(tags=["Tasks"], prefix="/tasks")
-
-db_deps = Annotated[AsyncSession, Depends(get_db)]
 
 
 @tasks_router.get("/", response_model=list[TaskDto])
