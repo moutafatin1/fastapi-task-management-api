@@ -1,10 +1,14 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 
 from app.tasks.dependencies import check_task_ownership
 from app.tasks.schemas import TaskCreateDto, TaskDto, TaskUpdateDto
-from app.tasks.service import TaskServiceDep
+from app.tasks.service import TaskService
 
 tasks_router = APIRouter(tags=["Tasks"], prefix="/tasks")
+
+TaskServiceDep = Annotated[TaskService, Depends()]
 
 
 @tasks_router.get("/", response_model=list[TaskDto])

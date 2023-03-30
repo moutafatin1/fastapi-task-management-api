@@ -45,4 +45,3 @@ class TaskService:
         return task
 
 
-TaskServiceDep = Annotated[TaskService, Depends()]
