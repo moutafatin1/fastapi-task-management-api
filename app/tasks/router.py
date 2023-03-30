@@ -1,28 +1,33 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.auth.dependencies import CurrentUser
-from app.database import db_deps
-from app.tasks import service
+from app.tasks.dependencies import check_task_ownership
 from app.tasks.schemas import TaskCreateDto, TaskDto, TaskUpdateDto
+from app.tasks.service import TaskServiceDep
 
 tasks_router = APIRouter(tags=["Tasks"], prefix="/tasks")
 
 
 @tasks_router.get("/", response_model=list[TaskDto])
-async def get_tasks(db: db_deps, user: CurrentUser):
-    return await service.get_tasks(db, user.id)
+async def get_tasks(
+    task_service: TaskServiceDep,
+):
+    return await task_service.get_tasks()
 
 
 @tasks_router.get("/{id}")
-async def get_task_by_id(id: int, db: db_deps, user: CurrentUser):
-    return await service.get_task_by_id(db, id)
+async def get_task_by_id(id: int, task_service: TaskServiceDep):
+    return await task_service.get_task_by_id(id)
 
 
 @tasks_router.post("/", response_model=TaskDto)
-async def create_task(db: db_deps, data: TaskCreateDto, user: CurrentUser):
-    return await service.create_task(db, data, user.id)
+async def create_task(data: TaskCreateDto, task_service: TaskServiceDep):
+    return await task_service.create_task(data)
 
 
-@tasks_router.put("/{id}")
-async def update_task(id: int, db: db_deps, data: TaskUpdateDto):
-    return await service.update_task(db, id, data)
+@tasks_router.put("/{id}", dependencies=[Depends(check_task_ownership)])
+async def update_task(
+    id: int,
+    data: TaskUpdateDto,
+    task_service: TaskServiceDep,
+):
+    return await task_service.update_task(data, id)

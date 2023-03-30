@@ -25,9 +25,11 @@ def create_access_token(
     return jwt.encode(payload, auth_config.JWT_SECRET, algorithm=auth_config.JWT_ALG)
 
 
-async def parse_jwt_user_data_optional(token: Annotated[str, Depends(oauth2_scheme)]):
+async def parse_jwt_user_data(
+    token: Annotated[str | None, Depends(oauth2_scheme)]
+) -> JWTData:
     if not token:
-        return None
+        raise AuthRequired()
     try:
         payload = jwt.decode(
             token, auth_config.JWT_SECRET, algorithms=[auth_config.JWT_ALG]
@@ -35,14 +37,6 @@ async def parse_jwt_user_data_optional(token: Annotated[str, Depends(oauth2_sche
     except JWTError:
         raise InvalidToken()
     return JWTData(**payload)
-
-
-async def parse_jwt_user_data(
-    token: Annotated[JWTData | None, Depends(parse_jwt_user_data_optional)]
-):
-    if not token:
-        raise AuthRequired()
-    return token
 
 
 async def create_refresh_token(

@@ -1,4 +1,5 @@
 from typing import Annotated
+
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
@@ -29,4 +30,4 @@ async def setup_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-db_deps = Annotated[AsyncSession, Depends(get_db)]
+DbDep = Annotated[AsyncSession, Depends(get_db)]
