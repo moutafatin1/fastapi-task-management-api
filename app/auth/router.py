@@ -65,7 +65,7 @@ async def get_current_user(user: CurrentUserDep):
     return user
 
 
-@auth_router.delete("/tokens")
+@auth_router.delete("/logout")
 async def logout(
     response: Response,
     refresh_token: Annotated[RefreshToken, Depends(valid_refresh_token)],

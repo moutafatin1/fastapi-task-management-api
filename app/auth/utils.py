@@ -2,7 +2,6 @@ import random
 import string
 
 from app.auth.config import auth_config
-from app.config import settings
 
 ALPHA_NUM = string.ascii_letters + string.digits
 
@@ -17,7 +16,7 @@ def get_refresh_token_cookie_settings(refresh_token: str, expired=False):
         "httponly": True,
         "samesite": "none",
         "secure": auth_config.SECURE_COOKIES,
-        "domain": settings.SITE_DOMAIN,
+        # "domain": settings.SITE_DOMAIN,
     }
     if expired:
         return base_cookie

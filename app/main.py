@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.auth.router import auth_router
 from app.database import setup_db
@@ -8,6 +9,13 @@ app = FastAPI(title="Task Management API", version="1.0.0")
 
 app.include_router(tasks_router)
 app.include_router(auth_router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")

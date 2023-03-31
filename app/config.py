@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     SQLALCHEMY_DATABASE_URL: PostgresDsn
     SQLALCHEMY_DATABASE_URL_SYNC: PostgresDsn
-    SITE_DOMAIN: str  # "site.com"
+    SITE_DOMAIN: str | None  # "site.com"
 
     class Config:
         env_file = ".env"
