@@ -21,3 +21,16 @@ app.add_middleware(
 @app.on_event("startup")
 async def init_db():
     await setup_db()
+
+
+# if __name__ == "__main__":
+#     import uvicorn
+
+#     uvicorn.run(
+#         "app.main:app",
+#         port=8000,
+#         host="0.0.0.0",
+#         reload=True,
+#         ssl_keyfile="fastapi-key.pem",
+#         ssl_certfile="fastapi.pem",
+#     )

@@ -64,6 +64,9 @@ async def get_refresh_token(db: AsyncSession, refresh_token: str):
     )
 
 
+# TODO: A background task to delete expired refresh tokens from database
+
+
 async def expire_refresh_token(db: AsyncSession, refresh_token_id: UUID4):
     await db.execute(
         update(RefreshToken)
