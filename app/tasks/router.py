@@ -35,3 +35,8 @@ async def update_task(
     task_service: TaskServiceDep,
 ):
     return await task_service.update_task(data, id)
+
+
+@tasks_router.delete("/{id}", dependencies=[Depends(check_task_ownership)])
+async def delete_task(id: int, task_service: TaskServiceDep):
+    return await task_service.delete_task(id)

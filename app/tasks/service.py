@@ -44,4 +44,8 @@ class TaskService:
         await self.db.commit()
         return task
 
+    async def delete_task(self,id:int):
+        task = await self.get_task_by_id(id)
+        await self.db.delete(task)
+        await self.db.commit()
 
